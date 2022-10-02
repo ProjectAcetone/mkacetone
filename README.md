@@ -10,7 +10,10 @@
 
 ## Acetone-EFI:
 
-Mostly compatible with [The Boot Loader Specification](https://systemd.io/BOOT_LOADER_SPECIFICATION/) entries
+To build run `mk-efi-img`, the output EFI executable will be in `out/$DEVICE-acetone.efi`
+
+Mostly compatible with [The Boot Loader Specification](https://systemd.io/BOOT_LOADER_SPECIFICATION/) entries.
+
 Also supports booting into other bootloaders, specified in BootXXXX Efi variables
 
 ### Build requirements:
