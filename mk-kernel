@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+ACETONEROOT="$(dirname $(realpath $0))"
+TMP="$ACETONEROOT/tmp"
+
+mkdir -p "$TMP/kernel/"
+
+# make sure we got the repo
+if [[ -e "$TMP/kernel/repo" ]]; then
+	git -C "$TMP/kernel/repo" pull
+else
+	git clone https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git -b "linux-rolling-stable" "$TMP/kernel/repo"
+fi
+
+
+cd "$TMP/kernel/repo"
+
+cp "$TMP/peroxide/peroxide-$RUSTARCH.cpio" "./initrd.cpio"
+cp "$ACETONEROOT/data/$DEVICE-defconfig" ./.config
+make olddefconfig
+make -j$(nproc)

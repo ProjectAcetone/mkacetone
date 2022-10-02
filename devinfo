@@ -1,0 +1,18 @@
+#!/bin/false
+
+case "$DEVICE" in
+	odroidgo2)
+		export ARCH="arm64"
+		export FANCY_NAME="Odroid Go Advance"
+		export RUSTARCH="aarch64"
+		export CROSS_COMPILE="aarch64-linux-gnu-"
+		;;
+	generic_x86)
+		export ARCH="x86_64"
+		export FANCY_NAME="An X86 device"
+		export RUSTARCH="$ARCH"
+		if ! uname -m | grep -iq x86_64; then
+			export CROSS_COMPILE="x86_64-pc-linux-gnu-"
+		fi
+		;;
+esac

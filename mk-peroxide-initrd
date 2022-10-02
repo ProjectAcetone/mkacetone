@@ -1,0 +1,42 @@
+#!/bin/bash
+set -e
+
+ACETONEROOT="$(dirname $(realpath $0))"
+TMP="$ACETONEROOT/tmp"
+
+mkdir -p "$TMP/peroxide/"
+
+# make sure we got the repo
+if [[ -e "$TMP/peroxide/repo" ]]; then
+	git -C "$TMP/peroxide/repo" pull
+else
+	git clone https://github.com/Maccraft123/peroxide.git "$TMP/peroxide/repo"
+fi
+
+# build as tiny as possible static executable
+cd "$TMP/peroxide/repo"
+cargo build --release \
+	--target $RUSTARCH-unknown-linux-musl \
+	--config profile.release.opt-level="'z'" \
+	--config profile.release.lto=true \
+	--config profile.release.codegen-units=16 \
+	--config 'profile.release.panic="abort"' \
+	--config 'target.aarch64-unknown-linux-musl.linker="aarch64-linux-gnu-gcc"' \
+	--config build.rustflags="'-C relocation-model=pie -C strip=symbols -C target-feature=+crt-static -C link-arg=-lgcc'"
+
+# shove that executable along with dev/console into an initrd image
+BIN="$TMP/peroxide/repo/target/$RUSTARCH-unknown-linux-musl/release/peroxide"
+
+CPIO_SRC="$TMP/peroxide/initrd"
+
+if [[ -e "$CPIO_SRC" ]]; then
+	rm -rf "$CPIO_SRC"
+fi
+
+mkdir -p "$CPIO_SRC"
+cp "$BIN" "$CPIO_SRC/init"
+
+mkdir -p "$CPIO_SRC/dev"
+echo "mknod -m 622 \"$CPIO_SRC/dev/console\" c 5 1
+printf \"init\ndev\ndev/console\n\" | cpio -D\"$CPIO_SRC\" --no-absolute-filenames -o --format=newc
+" | fakeroot > "$TMP/peroxide/peroxide-$RUSTARCH.cpio"
