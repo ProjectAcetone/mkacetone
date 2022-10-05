@@ -1,0 +1,25 @@
+# downstream uses different syntax
+if test -n "$sz_logo"; then
+	# read adc 0 (hardware revision info) into r_adc variable
+	adc 0
+else
+	adc single "saradc@ff288000" 0 r_adc
+fi
+
+if test $r_adc > 655 -a $r_adc < 695; then
+	setenv dtb "rk3326-odroid-go2-v11.dtb"
+elif test $r_adc > 816 -a $r_adc < 896; then
+	setenv dtb "rk3326-odroid-go2.dtb"
+elif test $r_adc > 40 -a $r_adc < 126; then
+	setenv dtb "rk3326-odroid-go3.dtb"
+fi
+
+setenv kernel_addr "0x2000000"
+setenv dtb_addr "0x1000000"
+
+setenv bootargs "console=ttyS2,115200 console=tty1"
+
+load mmc 1:1 $kernel_addr /boot/Image
+load mmc 1:1 $dtb_addr /boot/$dtb
+
+booti ${kernel_addr} - ${dtb_addr}

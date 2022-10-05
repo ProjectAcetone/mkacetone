@@ -19,4 +19,23 @@ source "$ACETONEROOT/devinfo"
 
 "$ACETONEROOT/mk-peroxide-initrd" "$RUSTARCH"
 "$ACETONEROOT/mk-kernel" "$DEVICE"
-"$ACETONEROOT/mk-u-boot" "$DEVICE"
+
+if [[ "$DEVICE_UBOOT_ON_SD" = "true" ]]; then
+	echo "TODO: putting u-boot on sd cards"
+fi
+
+if [[ -e "$ACETONEROOT/out/mnt" ]]; then
+	rm -rf "$ACETONEROOT/out/mnt"
+fi
+
+mkdir -p "$ACETONEROOT/out/mnt/boot"
+mkimage -A arm -T script -C none -n "Acetone Boot Script" -d "$ACETONEROOT/data/$DEVICE-boot.txt" "$ACETONEROOT/out/mnt/boot.scr"
+
+OLDPWD="$(pwd)"
+cd "$ACETONEROOT"
+for dtb in tmp/kernel/repo/arch/arm64/boot/dts/rockchip/*dtb; do
+	cp "$dtb" "out/mnt/boot/"
+done
+cd "$OLDPWD"
+
+cp "$ACETONEROOT/tmp/kernel/repo/arch/arm64/boot/Image" "$ACETONEROOT/out/mnt/boot/Image"
