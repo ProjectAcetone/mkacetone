@@ -18,5 +18,6 @@ cd "$TMP/kernel/repo"
 
 cp "$TMP/peroxide/peroxide-$RUSTARCH.cpio" "./initrd.cpio"
 cp "$ACETONEROOT/data/$DEVICE-defconfig" ./.config
-make olddefconfig
+make oldconfig
+make nconfig
 make -j$(nproc)
