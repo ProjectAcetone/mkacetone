@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 mkdir -p "$DESTDIR/efi/boot"
-cp "$ACETONEROOT/tmp/kernel/arch/x86_64/boot/bzImage" "$DESTDIR/boot/efi/bootx64.efi"
+cp "$ACETONEROOT/tmp/kernel/arch/x86_64/boot/bzImage" "$DESTDIR/efi/boot/bootx64.efi"
