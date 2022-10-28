@@ -1,0 +1,64 @@
+#!/bin/bash
+set -ex
+
+export ACETONEROOT="$(dirname $(realpath $0))"
+
+source "$ACETONEROOT/devinfo"
+
+if [[ -z "$DEVICE" ]]; then
+	echo "No device supplied in \$DEVICE env var, pick one of: $DEVICES"
+	exit 1
+fi
+
+if echo "$DEVICES" | grep -qv "$DEVICE"; then
+	echo "Invalid device detected, expected one of: $DEVICES, got: $DEVICE"
+	exit 1
+fi
+
+if [[ -z "$1" ]]; then
+	echo "1st argument has to be path to sd card or sd card image"
+	exit 1
+fi
+
+MICROSD="$1"
+
+dd if=/dev/zero of="$MICROSD" bs=1M count=32 status=none
+
+parted "$MICROSD" mklabel gpt
+if [[ "$DEVICE_UBOOT_ON_SD" = "true" ]]; then
+	parted "$MICROSD" -a none mkpart uboot_bootfw 64s 2047s
+fi
+
+parted "$MICROSD" mkpart acetone_boot 2048s 256MB
+parted "$MICROSD" set 1 esp on
+
+mkdir -p "$ACETONEROOT/tmp"
+export TMP="$ACETONEROOT/tmp"
+
+mkdir -p "$ACETONEROOT/tmp/boot"
+mkfs.fat -F 32 "$MICROSD"1
+mount "$MICROSD"1 "$ACETONEROOT/tmp/boot"
+
+function cleanup() {
+	umount "$ACETONEROOT/tmp/boot"
+}
+
+trap cleanup EXIT
+
+source "$ACETONEROOT/mk-peroxide-initrd"
+source "$ACETONEROOT/mk-kernel"
+DESTDIR="$ACETONEROOT/tmp/boot" "$ACETONEROOT/bootpart/$DEVICE_BOOTFW"
+
+if [[ "$DEBIAN" = "true" ]]; then
+	mkdir -p "$TMP/root"
+	parted "$MICROSD" mkpart root 257MB 100%
+	mkfs.ext4 "$MICROSD"2
+	mount "$MICROSD"2 "$TMP/root"
+	debootstrap --arch="$ARCH" sid "$TMP/root"
+
+	chroot "$TMP/root" apt update
+	chroot "$TMP/root" passwd -d root
+	chroot "$TMP/root" apt install kmscube weston evtest strace
+fi
+
+echo "Done!"
