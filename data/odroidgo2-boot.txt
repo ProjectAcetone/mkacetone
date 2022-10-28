@@ -19,7 +19,7 @@ setenv dtb_addr "0x1000000"
 
 setenv bootargs "console=ttyS2,115200 console=tty1"
 
-load mmc 1:1 $kernel_addr /boot/Image
-load mmc 1:1 $dtb_addr /boot/$dtb
+load mmc 1:1 $kernel_addr /Image
+load mmc 1:1 $dtb_addr /dtbs/$dtb
 
 booti ${kernel_addr} - ${dtb_addr}

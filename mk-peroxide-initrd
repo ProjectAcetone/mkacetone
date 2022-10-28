@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
-
-ACETONEROOT="$(dirname $(realpath $0))"
-TMP="$ACETONEROOT/tmp"
-
 mkdir -p "$TMP/peroxide/"
-
 # make sure we got the repo
 if [[ -e "$TMP/peroxide/repo" ]]; then
 	git -C "$TMP/peroxide/repo" pull
