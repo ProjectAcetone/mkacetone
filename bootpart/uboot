@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+mkimage -A arm -T script -C none -n "Acetone Boot Script" -d "$ACETONEROOT/data/$DEVICE-boot.txt" "$DESTDIR/boot.scr"
+
+mkdir "$DESTDIR/dtbs/"
+cp $TMP/kernel/arch/arm64/boot/dts/rockchip/*.dtb "$DESTDIR/dtbs/"
+cp "$ACETONEROOT/tmp/kernel/arch/arm64/boot/Image" "$DESTDIR/"
