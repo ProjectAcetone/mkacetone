@@ -43,6 +43,10 @@ function cleanup() {
 	umount "$ACETONEROOT/tmp/boot"
 }
 
+function cleanup_root() {
+	umount "$ACETONEROOT/tmp/root"
+}
+
 trap cleanup EXIT
 
 source "$ACETONEROOT/mk-peroxide-initrd"
@@ -50,15 +54,18 @@ source "$ACETONEROOT/mk-kernel"
 DESTDIR="$ACETONEROOT/tmp/boot" "$ACETONEROOT/bootpart/$DEVICE_BOOTFW"
 
 if [[ "$DEBIAN" = "true" ]]; then
+	touch "$TMP/boot/run_debian"
 	mkdir -p "$TMP/root"
 	parted "$MICROSD" mkpart root 257MB 100%
 	mkfs.ext4 "$MICROSD"2
 	mount "$MICROSD"2 "$TMP/root"
-	debootstrap --arch="$ARCH" sid "$TMP/root"
+	trap cleanup_root EXIT
+
+	debootstrap --arch="$DEBIAN_ARCH" sid "$TMP/root"
 
 	chroot "$TMP/root" apt update
 	chroot "$TMP/root" passwd -d root
-	chroot "$TMP/root" apt install kmscube weston evtest strace
+	chroot "$TMP/root" apt install -y kmscube weston evtest strace
 fi
 
 echo "Done!"

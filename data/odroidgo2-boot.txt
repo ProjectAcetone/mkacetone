@@ -18,7 +18,11 @@ fi
 setenv kernel_addr "0x2000000"
 setenv dtb_addr "0x1000000"
 
-setenv bootargs "console=ttyS2,115200 console=tty1"
+if test -e mmc 1:1 run_debian; then
+	setenv bootargs "console=ttyS2,115200 console=tty1 quiet root=PARTLABEL=root rootwait"
+else
+	setenv bootargs "console=ttyS2,115200 console=tty1 quiet"
+fi
 
 load mmc 1:1 $kernel_addr /Image
 load mmc 1:1 $dtb_addr /dtbs/$dtb

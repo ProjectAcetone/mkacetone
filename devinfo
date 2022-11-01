@@ -6,12 +6,14 @@ case "$DEVICE" in
 	odroidgo2)
 		export ARCH="arm64"
 		export RUSTARCH="aarch64"
+		export DEBIAN_ARCH="arm64"
 		export CROSS_COMPILE="aarch64-linux-gnu-"
 		export DEVICE_BOOTFW="uboot"
 		;;
 	generic_x86)
 		export ARCH="x86_64"
 		export RUSTARCH="$ARCH"
+		export DEBIAN_ARCH="amd64"
 		if ! uname -m | grep -iq x86_64; then
 			export CROSS_COMPILE="x86_64-pc-linux-gnu-"
 		fi
