@@ -13,6 +13,7 @@ cd "$TMP/kernel"
 
 cp "$TMP/peroxide/peroxide-$RUSTARCH.cpio" "./initrd.cpio"
 cp "$ACETONEROOT/data/$DEVICE-defconfig" ./.config
+echo "$CONF_APPEND" >> ./.config
 make olddefconfig
 #make nconfig
 make -j$(nproc)

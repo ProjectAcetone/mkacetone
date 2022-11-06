@@ -50,14 +50,16 @@ function cleanup_root() {
 
 trap cleanup EXIT
 
+export CONF_APPEND="CONFIG_INITRAMFS_SOURCE=\"initrd.cpio\""
 source "$ACETONEROOT/mk-peroxide-initrd"
 source "$ACETONEROOT/mk-kernel"
 DESTDIR="$ACETONEROOT/tmp/boot" "$ACETONEROOT/bootpart/$DEVICE_BOOTFW"
 
+mkdir -p "$ACETONEROOT/tmp/boot/loader/entries"
+
 if [[ "$DEBIAN" = "true" ]]; then
-	touch "$TMP/boot/run_debian"
 	mkdir -p "$TMP/root"
-	parted "$MICROSD" mkpart root 257MB 100%
+	parted "$MICROSD" mkpart debian 257MB 100%
 	mkfs.ext4 "$MICROSD"2
 	mount "$MICROSD"2 "$TMP/root"
 	trap cleanup_root EXIT
@@ -67,6 +69,14 @@ if [[ "$DEBIAN" = "true" ]]; then
 	chroot "$TMP/root" apt update
 	chroot "$TMP/root" passwd -d root
 	chroot "$TMP/root" apt install -y kmscube weston evtest strace
+
+	export CONF_APPEND=""
+	source "$ACETONEROOT/mk-kernel"
+	cp "$ACETONEROOT/tmp/kernel/arch/arm64/boot/Image" "$ACETONEROOT/tmp/boot/Image-noinitrd"
+
+	echo "title Debian
+linux /Image-noinitrd
+options console=ttyS2,115200 console=tty1 quiet root=PARTLABEL=debian rootwait" > "$ACETONEROOT/tmp/boot/loader/entries/debian.conf"
 fi
 
 echo "Done!"
