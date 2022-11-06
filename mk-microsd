@@ -45,6 +45,7 @@ function cleanup() {
 
 function cleanup_root() {
 	umount "$ACETONEROOT/tmp/root"
+	umount "$ACETONEROOT/tmp/boot"
 }
 
 trap cleanup EXIT
