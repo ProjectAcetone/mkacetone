@@ -68,7 +68,7 @@ if [[ "$DEBIAN" = "true" ]]; then
 
 	chroot "$TMP/root" apt update
 	chroot "$TMP/root" passwd -d root
-	chroot "$TMP/root" apt install -y kmscube weston evtest strace
+	chroot "$TMP/root" apt install -y kmscube weston evtest strace joystick
 
 	export CONF_APPEND=""
 	source "$ACETONEROOT/mk-kernel"
