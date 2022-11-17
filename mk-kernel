@@ -1,15 +1,24 @@
 #!/bin/bash
 set -e
 
-# make sure we got the repo
-if [[ -e "$TMP/kernel" ]]; then
-	git -C "$TMP/kernel" pull
+if [[ -e "$TMP/kernel-patches" ]]; then
+	git -C "$TMP/kernel-patches" pull
 else
-	git clone https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git -b "linux-6.0.y" "$TMP/kernel"
+	git clone https://github.com/Maccraft123/kernel-patches.git "$TMP/kernel-patches" -b mainline
 fi
 
+KERNELRELEASE="$(git -C $TMP/kernel-patches describe --tags --abbrev=0)"
+
+# make sure we got the repo
+if [ -e "$TMP/kernel" ]; then
+	git -C "$TMP/kernel" reset --hard
+	git -C "$TMP/kernel" fetch
+else
+	git clone https://github.com/torvalds/linux.git "$TMP/kernel"
+fi
 
 cd "$TMP/kernel"
+git checkout "$KERNELRELEASE"
 
 cp "$TMP/peroxide/peroxide-$RUSTARCH.cpio" "./initrd.cpio"
 cp "$ACETONEROOT/data/$SOC-defconfig" ./.config
