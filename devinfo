@@ -4,6 +4,7 @@ export DEVICES="odroidgo2 generic_x86"
 
 case "$DEVICE" in
 	odroidgo2)
+		export SOC="rk3326"
 		export ARCH="arm64"
 		export RUSTARCH="aarch64"
 		export DEBIAN_ARCH="arm64"
@@ -11,6 +12,7 @@ case "$DEVICE" in
 		export DEVICE_BOOTFW="uboot"
 		;;
 	generic_x86)
+		export SOC="generic_x86"
 		export ARCH="x86_64"
 		export RUSTARCH="$ARCH"
 		export DEBIAN_ARCH="amd64"

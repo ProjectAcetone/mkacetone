@@ -12,7 +12,7 @@ fi
 cd "$TMP/kernel"
 
 cp "$TMP/peroxide/peroxide-$RUSTARCH.cpio" "./initrd.cpio"
-cp "$ACETONEROOT/data/$DEVICE-defconfig" ./.config
+cp "$ACETONEROOT/data/$SOC-defconfig" ./.config
 echo "$CONF_APPEND" >> ./.config
 make olddefconfig
 #make nconfig
