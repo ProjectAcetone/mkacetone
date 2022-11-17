@@ -1,0 +1,29 @@
+# downstream uses different syntax
+if test -n "$sz_logo"; then
+	# read adc 0 (hardware revision info) into r_adc variable
+	adc 0
+else
+	adc single "saradc@ff288000" 0 r_adc
+fi
+
+if test $r_adc -gt 146 -a $r_adc -lt 186; then
+	setenv dtb "rk3326-anbernic-rg351mp.dtb"
+elif test $r_adc -gt 494 -a $r_adc -lt 534; then
+	setenv dtb "rk3326-anbernic-rg351v.dtb"
+elif test $r_adc -gt 655 -a $r_adc -lt 695; then
+	setenv dtb "rk3326-anbernic-rg351m.dtb"
+fi
+
+setenv kernel_addr "0x2000000"
+setenv dtb_addr "0x1000000"
+
+if test -e mmc 1:1 serial_console; then
+	setenv bootargs "console=ttyS2,115200 loglevel=6"
+else
+	setenv bootargs "console=tty1 loglevel=1"
+fi
+
+load mmc 1:1 $kernel_addr /Image
+load mmc 1:1 $dtb_addr /dtbs/$dtb
+
+booti ${kernel_addr} - ${dtb_addr}
