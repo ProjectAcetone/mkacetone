@@ -6,12 +6,12 @@ else
 	adc single "saradc@ff288000" 0 r_adc
 fi
 
-if test $r_adc > 655 -a $r_adc < 695; then
+if test $r_adc -gt 655 -a $r_adc -lt 695; then
 	# FIXME
 	setenv dtb "rk3326-odroid-go2.dtb"
-elif test $r_adc > 816 -a $r_adc < 896; then
+elif test $r_adc -gt 816 -a $r_adc -lt 896; then
 	setenv dtb "rk3326-odroid-go2.dtb"
-elif test $r_adc > 40 -a $r_adc < 126; then
+elif test $r_adc -gt 40 -a $r_adc -lt 126; then
 	setenv dtb "rk3326-odroid-go3.dtb"
 fi
 
